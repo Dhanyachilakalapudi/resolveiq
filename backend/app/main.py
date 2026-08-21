@@ -1,5 +1,12 @@
 from fastapi import FastAPI
 
+from .database import Base, engine
+from . import models
+
+
+Base.metadata.create_all(bind=engine)
+
+
 app = FastAPI(
     title="ResolveIQ API",
     description="AI-assisted exception resolution workbench",
@@ -18,5 +25,6 @@ def root():
 @app.get("/health")
 def health_check():
     return {
-        "status": "healthy"
+        "status": "healthy",
+        "database": "connected"
     }
