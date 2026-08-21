@@ -38,3 +38,5 @@ build/
 .cache/
 
 !.env.example
+
+frontend-ui/
