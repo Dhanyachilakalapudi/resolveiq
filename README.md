@@ -1,204 +1,55 @@
-\# ResolveIQ — AI-Assisted Exception Resolution Workbench
+# ResolveIQ – AI-Assisted Exception Resolution Workbench
 
+ResolveIQ is an AI-assisted exception resolution workbench built for the **Supervity Forward Deployed Engineer Technical Screening Assessment (Problem Statement 9)**.
 
+The application combines deterministic exception detection with AI-powered explanations and a confidence-gated workflow, ensuring that high-confidence exceptions can be resolved automatically while low-confidence cases remain under human control.
 
-ResolveIQ is an AI-assisted exception resolution workbench for reviewing and resolving flagged financial transactions.
+---
 
+## Problem Statement
 
+Build a lightweight web application where flagged transactions appear in a queue, allowing a reviewer to:
 
-\## Problem
+- View exception details
+- Understand why an exception was flagged
+- Receive an AI-generated resolution recommendation
+- Enforce confidence-based auto-resolution
+- Keep a human reviewer in control when confidence is low
 
+---
 
+## Features
 
-Finance and accounts-payable teams frequently encounter transaction exceptions such as:
+- Exception Queue Dashboard
+- AI-generated contextual explanations
+- Resolution recommendations
+- Confidence Gate (90% threshold)
+- Automatic resolution for high-confidence exceptions
+- Human Review workflow for low-confidence exceptions
+- Real-time queue status updates
+- FastAPI backend with Swagger documentation
+- SQLite-based mock data storage
 
+---
 
-
-\- Price mismatches
-
-\- Quantity mismatches
-
-\- Duplicate invoices
-
-\- Tax anomalies
-
-\- Missing purchase orders
-
-
-
-Manual investigation can be slow and inconsistent.
-
-
-
-ResolveIQ provides a centralized workbench where reviewers can inspect an exception, request AI-assisted analysis, review the recommendation and confidence, and take a controlled human decision.
-
-
-
-\## Solution
-
-
-
-ResolveIQ provides:
-
-
-
-\- Exception queue
-
-\- Exception detail view
-
-\- AI-assisted analysis
-
-\- Recommended resolution
-
-\- Confidence score
-
-\- Decision classification
-
-\- Human-in-the-loop approval workflow
-
-\- Reject workflow
-
-\- Persistent exception status
-
-\- REST APIs with Swagger/OpenAPI documentation
-
-
-
-\## Key Features
-
-
-
-\### Exception Queue
-
-
-
-The frontend displays flagged exceptions including:
-
-
-
-\- Exception ID
-
-\- Exception type
-
-\- Severity
-
-\- Status
-
-
-
-\### Exception Investigation
-
-
-
-Reviewers can inspect:
-
-
-
-\- Invoice ID
-
-\- Vendor
-
-\- Exception type
-
-\- Description
-
-\- Expected value
-
-\- Actual value
-
-\- Difference
-
-\- Severity
-
-
-
-\### AI-Assisted Analysis
-
-
-
-The resolution workflow provides:
-
-
-
-\- AI analysis
-
-\- Recommended action
-
-\- Confidence score
-
-\- Decision
-
-\- Human-review indication
-
-
-
-\### Human-in-the-Loop
-
-
-
-The final operational action remains under human control.
-
-
-
-Supported actions:
-
-
-
-\- Approve
-
-\- Reject
-
-
-
-\## Architecture
-
-
+## Architecture
 
 ```text
-
-React + Vite Frontend
-
-&#x20;       |
-
-&#x20;       | REST API
-
-&#x20;       v
-
-FastAPI Backend
-
-&#x20;       |
-
-&#x20;       +----------------------+
-
-&#x20;       |                      |
-
-&#x20;       v                      v
-
-Exception Engine       Resolution Service
-
-Business Rules         AI-Assisted Analysis
-
-&#x20;                             |
-
-&#x20;                             v
-
-&#x20;                    Confidence / Gate
-
-&#x20;                      Decision Logic
-
-&#x20;                             |
-
-&#x20;                             v
-
-&#x20;                    Human Review
-
-&#x20;                   Approve / Reject
-
-&#x20;                             |
-
-&#x20;                             v
-
-&#x20;                   Updated Exception
-
-&#x20;                          State
-
+Exception Queue
+      │
+      ▼
+Deterministic Exception Detection
+      │
+      ▼
+AI Analysis & Recommendation
+      │
+      ▼
+Confidence Gate (90%)
+      │
+ ┌────┴────┐
+ ▼         ▼
+Auto       Human
+Resolve    Review
+ │          │
+ ▼          ▼
+Queue Status Updated
