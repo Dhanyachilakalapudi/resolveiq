@@ -53,3 +53,42 @@ Resolve    Review
  │          │
  ▼          ▼
 Queue Status Updated
+
+## Local Verification
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Runs at:
+
+http://localhost:5173
+
+### Backend
+
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+Runs at:
+
+http://127.0.0.1:8000
+
+### API Documentation
+
+Swagger UI:
+
+http://127.0.0.1:8000/docs
+
+### Demo Flow
+
+1. Open the Exception Queue.
+2. Select **EXC-1001** to view AI analysis and a high-confidence auto-resolution path.
+3. Select **EXC-1005** to demonstrate the low-confidence human review workflow with Approve/Reject actions.
+4. Observe the queue reflecting the updated status.
