@@ -15,22 +15,28 @@ body {
 }
 
 
-header {
-  padding: 24px 40px;
-  background: #111827;
-  color: white;
-}
+/* ResolveIQ Branding (UI only - safe change) */
 
+header {
+  padding: 28px 40px;
+  background: linear-gradient(135deg, #111827, #1f2937);
+  color: white;
+  border-bottom: 3px solid #2563eb;
+}
 
 header h1 {
   margin: 0;
+  font-size: 2.3rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #ffffff;
 }
-
 
 header p {
-  margin-bottom: 0;
+  margin: 8px 0 0;
+  color: #d1d5db;
+  font-size: 1rem;
 }
-
 
 main {
   display: grid;
