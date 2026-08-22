@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+﻿from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -32,4 +32,17 @@ def analyze_exception(
             detail="Exception not found"
         )
 
-    return resolve_exception(exception)
+    result = resolve_exception(exception)
+
+    # Backend is the source of truth.
+    # Only a successful confidence-gated decision can
+    # automatically resolve the exception.
+    if result["auto_resolve"]:
+        exception.status = "RESOLVED"
+        db.commit()
+        db.refresh(exception)
+
+    return {
+        **result,
+        "status": exception.status,
+    }

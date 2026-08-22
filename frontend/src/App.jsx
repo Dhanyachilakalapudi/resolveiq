@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import api from "./api";
 import "./App.css";
 
@@ -20,6 +20,18 @@ function App() {
       console.log("EXCEPTIONS:", response.data);
 
       setExceptions(response.data);
+
+      // Keep selected exception synchronized with database state.
+      if (selected) {
+        const updated = response.data.find(
+          (item) => item.exception_id === selected.exception_id
+        );
+
+        if (updated) {
+          setSelected(updated);
+        }
+      }
+
     } catch (error) {
       console.error("EXCEPTIONS ERROR:", error);
     }
@@ -31,22 +43,32 @@ function App() {
 
     try {
 
-      const response = await api.post(`/resolution/${exceptionId}`);
+      const response = await api.post(
+        `/resolution/${exceptionId}`
+      );
 
       console.log("RESOLUTION:", response.data);
 
       setAnalysis(response.data);
+
+      // Refresh queue so backend status is immediately visible.
+      await loadExceptions();
 
     } catch (error) {
 
       console.error("RESOLUTION ERROR:", error);
 
       setAnalysis({
-        analysis: "Unable to generate AI analysis.",
-        recommended_action: "Please try again or send this exception for human review.",
+        analysis: "AI analysis is currently unavailable.",
+        recommended_action:
+          "Review the exception manually before taking action.",
         confidence: 0,
-        decision: "REVIEW",
-        requires_human_review: true
+        threshold: 0.90,
+        decision: "HUMAN REVIEW",
+        auto_resolve: false,
+        requires_human_review: true,
+        confidence_reason:
+          "Automatic resolution is unavailable because AI analysis failed. Human review is required."
       });
 
     } finally {
@@ -60,7 +82,9 @@ function App() {
 
     try {
 
-      await api.post(`/workflow/${exceptionId}/approve`);
+      await api.post(
+        `/workflow/${exceptionId}/approve`
+      );
 
       await loadExceptions();
 
@@ -77,7 +101,9 @@ function App() {
 
     try {
 
-      await api.post(`/workflow/${exceptionId}/reject`);
+      await api.post(
+        `/workflow/${exceptionId}/reject`
+      );
 
       await loadExceptions();
 
@@ -89,6 +115,17 @@ function App() {
 
     }
   }
+
+  const thresholdPercent = analysis?.threshold
+    ? (analysis.threshold * 100).toFixed(0)
+    : "90";
+
+  const confidencePercent = analysis
+    ? ((analysis.confidence || 0) * 100).toFixed(0)
+    : "0";
+
+  const isAutoResolved =
+    analysis?.decision === "AUTO-RESOLVE";
 
   return (
 
@@ -180,17 +217,22 @@ function App() {
 
               <p>
                 <strong>Expected:</strong>{" "}
-                {selected.expected_value}
+                {selected.expected_value ?? "N/A"}
               </p>
 
               <p>
                 <strong>Actual:</strong>{" "}
-                {selected.actual_value}
+                {selected.actual_value ?? "N/A"}
               </p>
 
               <p>
                 <strong>Difference:</strong>{" "}
-                {selected.difference}
+                {selected.difference ?? "N/A"}
+              </p>
+
+              <p>
+                <strong>Current Status:</strong>{" "}
+                {selected.status}
               </p>
 
               <button
@@ -226,38 +268,88 @@ function App() {
                   <h3>Confidence</h3>
 
                   <p>
-                    {(analysis.confidence * 100).toFixed(0)}%
+                    <strong>
+                      {confidencePercent}%
+                    </strong>
                   </p>
 
-                  <h3>Decision</h3>
+                  <h3>Confidence Gate</h3>
 
                   <p>
-                    {analysis.decision}
+                    {isAutoResolved
+                      ? `✓ Above ${thresholdPercent}% threshold`
+                      : `⚠ Below ${thresholdPercent}% threshold`}
                   </p>
 
-                  <div>
+                  <h3>System Decision</h3>
 
-                    <p>
-                      Human approval workflow
-                    </p>
+                  <p>
+                    <strong>
+                      {analysis.decision}
+                    </strong>
+                  </p>
 
-                    <button
-                      onClick={() =>
-                        approveException(selected.exception_id)
-                      }
-                    >
-                      Approve
-                    </button>
+                  <p>
+                    {analysis.confidence_reason}
+                  </p>
 
-                    <button
-                      onClick={() =>
-                        rejectException(selected.exception_id)
-                      }
-                    >
-                      Reject
-                    </button>
+                  <h3>Status</h3>
 
-                  </div>
+                  <p>
+                    <strong>
+                      {analysis.status ||
+                        (isAutoResolved
+                          ? "RESOLVED"
+                          : selected.status)}
+                    </strong>
+                  </p>
+
+                  {analysis.requires_human_review && (
+
+                    <div className="review">
+
+                      <p>
+                        <strong>
+                          Human review is required.
+                        </strong>
+                      </p>
+
+                      <button
+                        onClick={() =>
+                          approveException(
+                            selected.exception_id
+                          )
+                        }
+                      >
+                        Approve
+                      </button>
+
+                      <button
+                        onClick={() =>
+                          rejectException(
+                            selected.exception_id
+                          )
+                        }
+                      >
+                        Reject
+                      </button>
+
+                    </div>
+
+                  )}
+
+                  {isAutoResolved && (
+
+                    <div className="review">
+
+                      <p>
+                        ✓ Exception automatically resolved
+                        by the confidence gate.
+                      </p>
+
+                    </div>
+
+                  )}
 
                 </div>
 
@@ -283,5 +375,3 @@ function App() {
 }
 
 export default App;
-
-

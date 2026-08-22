@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+﻿from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
@@ -31,12 +31,13 @@ def approve_exception(
             detail="Exception not found"
         )
 
-    exception.status = "APPROVED"
+    exception.status = "RESOLVED"
+
     db.commit()
     db.refresh(exception)
 
     return {
-        "message": "Exception approved by human reviewer",
+        "message": "Exception resolved by human reviewer",
         "exception_id": exception.exception_id,
         "status": exception.status
     }
@@ -63,6 +64,7 @@ def reject_exception(
         )
 
     exception.status = "REJECTED"
+
     db.commit()
     db.refresh(exception)
 
